@@ -12,65 +12,74 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
-
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "reservations")
 @Getter
 public class Reservation {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Setter
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "room_id", nullable = false)
-    private Room room;
+  @Setter
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "room_id", nullable = false)
+  private Room room;
 
-    @Setter
-    @Column(name = "guest_name", nullable = false)
-    private String guestName;
+  @Setter
+  @Column(name = "guest_name", nullable = false)
+  private String guestName;
 
-    @Setter
-    @Column(name = "guest_email", nullable = false)
-    private String guestEmail;
+  @Setter
+  @Column(name = "guest_email", nullable = false)
+  private String guestEmail;
 
-    @Setter
-    @Column(name = "check_in_date", nullable = false)
-    private LocalDate checkInDate;
+  @Setter
+  @Column(name = "check_in_date", nullable = false)
+  private LocalDate checkInDate;
 
-    @Setter
-    @Column(name = "check_out_date", nullable = false)
-    private LocalDate checkOutDate;
+  @Setter
+  @Column(name = "check_out_date", nullable = false)
+  private LocalDate checkOutDate;
 
-    @Setter
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private ReservationStatus status;
+  @Setter
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 20)
+  private ReservationStatus status;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+  @Column(name = "total_price", nullable = false, precision = 12, scale = 2)
+  private BigDecimal totalPrice;
 
-    protected Reservation() {
-    }
+  @Column(name = "created_at", nullable = false, updatable = false)
+  private LocalDateTime createdAt;
 
-    public Reservation(Room room, String guestName, String guestEmail,
-                        LocalDate checkInDate, LocalDate checkOutDate, ReservationStatus status) {
-        this.room = room;
-        this.guestName = guestName;
-        this.guestEmail = guestEmail;
-        this.checkInDate = checkInDate;
-        this.checkOutDate = checkOutDate;
-        this.status = status != null ? status : ReservationStatus.PENDING;
-    }
+  protected Reservation() {}
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
+  public Reservation(
+      Room room,
+      String guestName,
+      String guestEmail,
+      LocalDate checkInDate,
+      LocalDate checkOutDate,
+      ReservationStatus status,
+      BigDecimal totalPrice) {
+    this.room = room;
+    this.guestName = guestName;
+    this.guestEmail = guestEmail;
+    this.checkInDate = checkInDate;
+    this.checkOutDate = checkOutDate;
+    this.status = status != null ? status : ReservationStatus.PENDING;
+    this.totalPrice = totalPrice;
+  }
+
+  @PrePersist
+  protected void onCreate() {
+    this.createdAt = LocalDateTime.now();
+  }
 }

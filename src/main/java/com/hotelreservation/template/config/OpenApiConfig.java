@@ -8,12 +8,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
 
-    @Bean
-    public OpenAPI hotelReservationOpenApi() {
-        return new OpenAPI()
-                .info(new Info()
-                        .title("Hotel Reservation Template API")
-                        .description("Example CRUD endpoints for hotels, rooms, and reservations")
-                        .version("v0.0.1"));
-    }
+  @Bean
+  public OpenAPI hotelReservationOpenApi() {
+    return new OpenAPI()
+        .info(
+            new Info()
+                .title("Hotel Reservation Template API")
+                .description("Example CRUD endpoints for hotels, rooms, and reservations")
+                .version("v0.0.1"));
+  }
 }

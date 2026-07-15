@@ -3,6 +3,8 @@ package com.hotelreservation.template.controller;
 import com.hotelreservation.template.dto.RoomDto;
 import com.hotelreservation.template.service.RoomService;
 import jakarta.validation.Valid;
+import java.net.URI;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,38 +15,35 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/rooms")
 public class RoomController {
 
-    private final RoomService roomService;
+  private final RoomService roomService;
 
-    public RoomController(RoomService roomService) {
-        this.roomService = roomService;
-    }
+  public RoomController(RoomService roomService) {
+    this.roomService = roomService;
+  }
 
-    @GetMapping
-    public List<RoomDto> getAll(@RequestParam(required = false) Long hotelId) {
-        return hotelId != null ? roomService.getByHotel(hotelId) : roomService.getAll();
-    }
+  @GetMapping
+  public List<RoomDto> getAll(@RequestParam(required = false) Long hotelId) {
+    return hotelId != null ? roomService.getByHotel(hotelId) : roomService.getAll();
+  }
 
-    @GetMapping("/{id}")
-    public RoomDto getById(@PathVariable Long id) {
-        return roomService.getById(id);
-    }
+  @GetMapping("/{id}")
+  public RoomDto getById(@PathVariable Long id) {
+    return roomService.getById(id);
+  }
 
-    @PostMapping
-    public ResponseEntity<RoomDto> create(@Valid @RequestBody RoomDto dto) {
-        RoomDto created = roomService.create(dto);
-        return ResponseEntity.created(URI.create("/api/rooms/" + created.id())).body(created);
-    }
+  @PostMapping
+  public ResponseEntity<RoomDto> create(@Valid @RequestBody RoomDto dto) {
+    RoomDto created = roomService.create(dto);
+    return ResponseEntity.created(URI.create("/api/rooms/" + created.id())).body(created);
+  }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        roomService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> delete(@PathVariable Long id) {
+    roomService.delete(id);
+    return ResponseEntity.noContent().build();
+  }
 }
