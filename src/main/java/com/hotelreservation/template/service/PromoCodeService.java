@@ -4,6 +4,7 @@ import com.hotelreservation.template.config.ResourceNotFoundException;
 import com.hotelreservation.template.domain.DiscountType;
 import com.hotelreservation.template.domain.PromoCode;
 import com.hotelreservation.template.dto.PromoCodeDto;
+import com.hotelreservation.template.mapper.PromoCodeMapper;
 import com.hotelreservation.template.repository.PromoCodeRepository;
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,17 +16,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class PromoCodeService {
 
   private final PromoCodeRepository promoCodeRepository;
+  private final PromoCodeMapper promoCodeMapper;
 
-  public PromoCodeService(PromoCodeRepository promoCodeRepository) {
+  public PromoCodeService(
+      PromoCodeRepository promoCodeRepository, PromoCodeMapper promoCodeMapper) {
     this.promoCodeRepository = promoCodeRepository;
+    this.promoCodeMapper = promoCodeMapper;
   }
 
   public List<PromoCodeDto> getAll() {
-    return promoCodeRepository.findAll().stream().map(PromoCodeService::toDto).toList();
+    return promoCodeRepository.findAll().stream().map(promoCodeMapper::toDto).toList();
   }
 
   public PromoCodeDto getById(Long id) {
-    return toDto(findEntity(id));
+    return promoCodeMapper.toDto(findEntity(id));
   }
 
   public PromoCodeDto create(PromoCodeDto dto) {
@@ -44,7 +48,7 @@ public class PromoCodeService {
             dto.validUntil(),
             dto.minimumSubtotal(),
             dto.maxUses());
-    return toDto(promoCodeRepository.save(promoCode));
+    return promoCodeMapper.toDto(promoCodeRepository.save(promoCode));
   }
 
   @Transactional
@@ -72,19 +76,5 @@ public class PromoCodeService {
     return promoCodeRepository
         .findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Promo code not found: " + id));
-  }
-
-  private static PromoCodeDto toDto(PromoCode promoCode) {
-    return new PromoCodeDto(
-        promoCode.getId(),
-        promoCode.getCode(),
-        promoCode.getDiscountType(),
-        promoCode.getDiscountValue(),
-        promoCode.isActive(),
-        promoCode.getValidFrom(),
-        promoCode.getValidUntil(),
-        promoCode.getMinimumSubtotal(),
-        promoCode.getMaxUses(),
-        promoCode.getUsedCount());
   }
 }

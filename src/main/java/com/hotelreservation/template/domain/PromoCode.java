@@ -12,11 +12,14 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "promo_codes")
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PromoCode {
 
   @Id
@@ -53,8 +56,6 @@ public class PromoCode {
 
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
-
-  protected PromoCode() {}
 
   public PromoCode(
       String code,

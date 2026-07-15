@@ -5,6 +5,7 @@ import com.hotelreservation.template.domain.Reservation;
 import com.hotelreservation.template.domain.ReservationStatus;
 import com.hotelreservation.template.domain.Room;
 import com.hotelreservation.template.dto.ReservationDto;
+import com.hotelreservation.template.mapper.ReservationMapper;
 import com.hotelreservation.template.repository.ReservationRepository;
 import com.hotelreservation.template.repository.RoomRepository;
 import java.time.temporal.ChronoUnit;
@@ -18,28 +19,31 @@ public class ReservationService {
   private final ReservationRepository reservationRepository;
   private final RoomRepository roomRepository;
   private final ReservationPricingService reservationPricingService;
+  private final ReservationMapper reservationMapper;
 
   public ReservationService(
       ReservationRepository reservationRepository,
       RoomRepository roomRepository,
-      ReservationPricingService reservationPricingService) {
+      ReservationPricingService reservationPricingService,
+      ReservationMapper reservationMapper) {
     this.reservationRepository = reservationRepository;
     this.roomRepository = roomRepository;
     this.reservationPricingService = reservationPricingService;
+    this.reservationMapper = reservationMapper;
   }
 
   public List<ReservationDto> getAll() {
-    return reservationRepository.findAll().stream().map(ReservationService::toDto).toList();
+    return reservationRepository.findAll().stream().map(reservationMapper::toDto).toList();
   }
 
   public List<ReservationDto> getByRoom(Long roomId) {
     return reservationRepository.findByRoomId(roomId).stream()
-        .map(ReservationService::toDto)
+        .map(reservationMapper::toDto)
         .toList();
   }
 
   public ReservationDto getById(Long id) {
-    return toDto(findEntity(id));
+    return reservationMapper.toDto(findEntity(id));
   }
 
   @Transactional
@@ -67,7 +71,7 @@ public class ReservationService {
             price.discountAmount(),
             price.totalPrice(),
             price.promoCode());
-    return toDto(reservationRepository.save(reservation));
+    return reservationMapper.toDto(reservationRepository.save(reservation));
   }
 
   public void delete(Long id) {
@@ -78,20 +82,5 @@ public class ReservationService {
     return reservationRepository
         .findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Reservation not found: " + id));
-  }
-
-  private static ReservationDto toDto(Reservation r) {
-    return new ReservationDto(
-        r.getId(),
-        r.getRoom().getId(),
-        r.getGuestName(),
-        r.getGuestEmail(),
-        r.getCheckInDate(),
-        r.getCheckOutDate(),
-        r.getStatus(),
-        r.getPromoCode(),
-        r.getSubtotalPrice(),
-        r.getDiscountAmount(),
-        r.getTotalPrice());
   }
 }
