@@ -25,6 +25,8 @@ class ReservationServiceTest extends ReservationIntegrationTestSupport {
     ReservationDto retrieved = reservationService.getById(created.id());
 
     // Then
+    assertThat(created.subtotalPrice()).isEqualByComparingTo("376.50");
+    assertThat(created.discountAmount()).isEqualByComparingTo("0.00");
     assertThat(created.totalPrice()).isEqualByComparingTo("376.50");
     assertThat(retrieved.totalPrice()).isEqualByComparingTo("376.50");
   }
@@ -47,7 +49,7 @@ class ReservationServiceTest extends ReservationIntegrationTestSupport {
   void rejectsClientSuppliedTotalPrice() {
     // Given
     ReservationDto request =
-        reservationRequest(
+        reservationRequestWithServerPrices(
             1L, LocalDate.of(2026, 8, 1), LocalDate.of(2026, 8, 2), new BigDecimal("1.00"));
 
     // When

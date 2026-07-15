@@ -24,6 +24,12 @@ public class GlobalExceptionHandler {
         .body(body(HttpStatus.BAD_REQUEST, ex.getMessage()));
   }
 
+  @ExceptionHandler(InvalidPromoCodeException.class)
+  public ResponseEntity<Map<String, Object>> handleInvalidPromoCode(InvalidPromoCodeException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body(body(HttpStatus.BAD_REQUEST, ex.getMessage()));
+  }
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
     Map<String, Object> responseBody = body(HttpStatus.BAD_REQUEST, "Validation failed");

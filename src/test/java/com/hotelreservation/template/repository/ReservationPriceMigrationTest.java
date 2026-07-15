@@ -35,8 +35,16 @@ class ReservationPriceMigrationTest {
     BigDecimal totalPrice =
         database.queryBigDecimal(
             "SELECT total_price FROM reservations WHERE id = 1", "total_price");
+    BigDecimal subtotalPrice =
+        database.queryBigDecimal(
+            "SELECT subtotal_price FROM reservations WHERE id = 1", "subtotal_price");
+    BigDecimal discountAmount =
+        database.queryBigDecimal(
+            "SELECT discount_amount FROM reservations WHERE id = 1", "discount_amount");
 
     // Then
     assertThat(totalPrice).isEqualByComparingTo(new BigDecimal("376.50"));
+    assertThat(subtotalPrice).isEqualByComparingTo(new BigDecimal("376.50"));
+    assertThat(discountAmount).isEqualByComparingTo(BigDecimal.ZERO);
   }
 }

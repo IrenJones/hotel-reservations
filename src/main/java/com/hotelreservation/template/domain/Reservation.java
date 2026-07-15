@@ -56,6 +56,15 @@ public class Reservation {
   @Column(name = "total_price", nullable = false, precision = 12, scale = 2)
   private BigDecimal totalPrice;
 
+  @Column(name = "subtotal_price", nullable = false, precision = 12, scale = 2)
+  private BigDecimal subtotalPrice;
+
+  @Column(name = "discount_amount", nullable = false, precision = 12, scale = 2)
+  private BigDecimal discountAmount;
+
+  @Column(name = "promo_code", length = 50)
+  private String promoCode;
+
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
@@ -68,14 +77,20 @@ public class Reservation {
       LocalDate checkInDate,
       LocalDate checkOutDate,
       ReservationStatus status,
-      BigDecimal totalPrice) {
+      BigDecimal subtotalPrice,
+      BigDecimal discountAmount,
+      BigDecimal totalPrice,
+      String promoCode) {
     this.room = room;
     this.guestName = guestName;
     this.guestEmail = guestEmail;
     this.checkInDate = checkInDate;
     this.checkOutDate = checkOutDate;
     this.status = status != null ? status : ReservationStatus.PENDING;
+    this.subtotalPrice = subtotalPrice;
+    this.discountAmount = discountAmount;
     this.totalPrice = totalPrice;
+    this.promoCode = promoCode;
   }
 
   @PrePersist

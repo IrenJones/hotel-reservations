@@ -7,21 +7,25 @@ import com.hotelreservation.template.domain.Room;
 import com.hotelreservation.template.dto.ReservationDto;
 import com.hotelreservation.template.repository.ReservationRepository;
 import com.hotelreservation.template.repository.RoomRepository;
-import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ReservationService {
 
   private final ReservationRepository reservationRepository;
   private final RoomRepository roomRepository;
+  private final ReservationPricingService reservationPricingService;
 
   public ReservationService(
-      ReservationRepository reservationRepository, RoomRepository roomRepository) {
+      ReservationRepository reservationRepository,
+      RoomRepository roomRepository,
+      ReservationPricingService reservationPricingService) {
     this.reservationRepository = reservationRepository;
     this.roomRepository = roomRepository;
+    this.reservationPricingService = reservationPricingService;
   }
 
   public List<ReservationDto> getAll() {
@@ -38,6 +42,7 @@ public class ReservationService {
     return toDto(findEntity(id));
   }
 
+  @Transactional
   public ReservationDto create(ReservationDto dto) {
     if (!dto.checkOutDate().isAfter(dto.checkInDate())) {
       throw new IllegalArgumentException("checkOutDate must be after checkInDate");
@@ -48,7 +53,8 @@ public class ReservationService {
             .orElseThrow(() -> new ResourceNotFoundException("Room not found: " + dto.roomId()));
     ReservationStatus status = dto.status() != null ? dto.status() : ReservationStatus.PENDING;
     long nights = ChronoUnit.DAYS.between(dto.checkInDate(), dto.checkOutDate());
-    BigDecimal totalPrice = room.getPricePerNight().multiply(BigDecimal.valueOf(nights));
+    ReservationPricingService.ReservationPrice price =
+        reservationPricingService.calculate(room.getPricePerNight(), nights, dto.promoCode());
     Reservation reservation =
         new Reservation(
             room,
@@ -57,7 +63,10 @@ public class ReservationService {
             dto.checkInDate(),
             dto.checkOutDate(),
             status,
-            totalPrice);
+            price.subtotalPrice(),
+            price.discountAmount(),
+            price.totalPrice(),
+            price.promoCode());
     return toDto(reservationRepository.save(reservation));
   }
 
@@ -80,6 +89,9 @@ public class ReservationService {
         r.getCheckInDate(),
         r.getCheckOutDate(),
         r.getStatus(),
+        r.getPromoCode(),
+        r.getSubtotalPrice(),
+        r.getDiscountAmount(),
         r.getTotalPrice());
   }
 }

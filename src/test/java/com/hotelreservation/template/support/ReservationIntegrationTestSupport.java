@@ -1,12 +1,16 @@
 package com.hotelreservation.template.support;
 
+import com.hotelreservation.template.domain.DiscountType;
 import com.hotelreservation.template.domain.Hotel;
 import com.hotelreservation.template.domain.ReservationStatus;
 import com.hotelreservation.template.domain.Room;
 import com.hotelreservation.template.domain.RoomType;
+import com.hotelreservation.template.dto.PromoCodeDto;
 import com.hotelreservation.template.dto.ReservationDto;
 import com.hotelreservation.template.repository.HotelRepository;
+import com.hotelreservation.template.repository.PromoCodeRepository;
 import com.hotelreservation.template.repository.RoomRepository;
+import com.hotelreservation.template.service.PromoCodeService;
 import com.hotelreservation.template.service.ReservationService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
@@ -25,6 +29,10 @@ public abstract class ReservationIntegrationTestSupport {
 
   @Autowired protected Validator validator;
 
+  @Autowired protected PromoCodeService promoCodeService;
+
+  @Autowired protected PromoCodeRepository promoCodeRepository;
+
   @Autowired private HotelRepository hotelRepository;
 
   protected Room createRoom(String pricePerNight) {
@@ -39,6 +47,22 @@ public abstract class ReservationIntegrationTestSupport {
   }
 
   protected ReservationDto reservationRequest(
+      Long roomId, LocalDate checkIn, LocalDate checkOut, String promoCode) {
+    return new ReservationDto(
+        null,
+        roomId,
+        "Test Guest",
+        "guest@example.com",
+        checkIn,
+        checkOut,
+        ReservationStatus.PENDING,
+        promoCode,
+        null,
+        null,
+        null);
+  }
+
+  protected ReservationDto reservationRequestWithServerPrices(
       Long roomId, LocalDate checkIn, LocalDate checkOut, BigDecimal totalPrice) {
     return new ReservationDto(
         null,
@@ -48,6 +72,25 @@ public abstract class ReservationIntegrationTestSupport {
         checkIn,
         checkOut,
         ReservationStatus.PENDING,
+        null,
+        null,
+        null,
         totalPrice);
+  }
+
+  protected PromoCodeDto createPromoCode(
+      String code, DiscountType type, String value, Integer maxUses) {
+    return promoCodeService.create(
+        new PromoCodeDto(
+            null,
+            code,
+            type,
+            new BigDecimal(value),
+            true,
+            LocalDate.now().minusDays(1),
+            LocalDate.now().plusDays(1),
+            null,
+            maxUses,
+            null));
   }
 }

@@ -16,4 +16,7 @@ public record ReservationDto(
     @NotNull(message = "checkInDate is required") LocalDate checkInDate,
     @NotNull(message = "checkOutDate is required") LocalDate checkOutDate,
     ReservationStatus status,
+    String promoCode,
+    @Null(message = "subtotalPrice is calculated by the server") BigDecimal subtotalPrice,
+    @Null(message = "discountAmount is calculated by the server") BigDecimal discountAmount,
     @Null(message = "totalPrice is calculated by the server") BigDecimal totalPrice) {}
